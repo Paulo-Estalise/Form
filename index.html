@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Prestador de Serviços</title>
+    <style>
+        /* Reset básico */
+        body, h1, h3, p, label, input, button, form {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+        }
+
+        /* Botão "Área do Gestor" no canto superior direito */
+        #managerButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #managerButton:hover {
+            background-color: #333333;
+        }
+
+        /* Estilo do formulário */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #000000;
+            outline: none;
+        }
+
+        .item {
+            margin-bottom: 15px;
+        }
+
+        button[type="button"],
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        button[type="button"]:hover,
+        button[type="submit"]:hover {
+            background-color: #333333;
+        }
+
+        /* Mensagem de erro */
+        #cityError {
+            color: #ff0000;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            form {
+                padding: 15px;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Botão "Área do Gestor" -->
+    <button id="managerButton" onclick="redirectToManager()">Área do Gestor</button>
+
+    <h1>Formulário de Prestador de Serviços</h1>
+    <form id="serviceProviderForm">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="phone">Telefone:</label>
+        <input type="text" id="phone" name="phone" required><br><br>
+
+        <label for="city">Cidade:</label>
+        <input type="text" id="city" name="city" required oninput="validateCity(this)">
+        <p id="cityError">Caracteres inválidos (não use traços ou asteriscos).</p><br><br>
+
+        <label for="client">Cliente:</label>
+        <input type="text" id="client" name="client" required><br><br>
+
+        <label for="budget">Orçamento Total:</label>
+        <input type="number" id="budget" name="budget" readonly><br><br>
+
+        <h3>Itens Necessários</h3>
+        <div id="items">
+            <div class="item">
+                <label for="item1">Item 1:</label>
+                <input type="text" id="item1" name="items[]" required>
+                <label for="area1">Metros Quadrados:</label>
+                <input type="number" id="area1" name="areas[]" required oninput="calculateTotal()">
+                <label for="price1">Preço por m²:</label>
+                <input type="number" id="price1" name="prices[]" required oninput="calculateTotal()">
+            </div>
+        </div>
+        <button type="button" onclick="addItem()">Adicionar Item</button><br><br>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        // Função para redirecionar para a tela de login do gestor
+        function redirectToManager() {
+            window.location.href = "loginGestor.html";
+        }
+
+        // Função para validar a cidade
+        function validateCity(input) {
+            const cityError = document.getElementById("cityError");
+            const regex = /^[a-zA-ZÀ-ÿ\s]+$/; // Aceita apenas letras e espaços
+            if (!regex.test(input.value)) {
+                cityError.style.display = "block";
+            } else {
+                cityError.style.display = "none";
+            }
+        }
+
+        // Função para adicionar novos itens
+        function addItem() {
+            const itemsDiv = document.getElementById("items");
+            const itemCount = itemsDiv.children.length + 1;
+
+            const newItem = document.createElement("div");
+            newItem.classList.add("item");
+
+            newItem.innerHTML = `
+                <label for="item${itemCount}">Item ${itemCount}:</label>
+                <input type="text" id="item${itemCount}" name="items[]" required>
+                <label for="area${itemCount}">Metros Quadrados:</label>
+                <input type="number" id="area${itemCount}" name="areas[]" required oninput="calculateTotal()">
+                <label for="price${itemCount}">Preço por m²:</label>
+                <input type="number" id="price${itemCount}" name="prices[]" required oninput="calculateTotal()">
+            `;
+
+            itemsDiv.appendChild(newItem);
+        }
+
+        // Função para calcular o orçamento total
+        function calculateTotal() {
+            const areas = document.querySelectorAll("input[name='areas[]']");
+            const prices = document.querySelectorAll("input[name='prices[]']");
+            let total = 0;
+
+            areas.forEach((area, index) => {
+                const areaValue = parseFloat(area.value) || 0;
+                const priceValue = parseFloat(prices[index].value) || 0;
+                total += areaValue * priceValue;
+            });
+
+            document.getElementById("budget").value = total.toFixed(2);
+        }
+
+        // Função para enviar os dados do formulário para o backend
+        document.getElementById("serviceProviderForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const city = document.getElementById("city").value;
+            const client = document.getElementById("client").value;
+            const budget = document.getElementById("budget").value;
+
+            const items = [];
+            const itemInputs = document.querySelectorAll("input[name='items[]']");
+            const areaInputs = document.querySelectorAll("input[name='areas[]']");
+            const priceInputs = document.querySelectorAll("input[name='prices[]']");
+
+            itemInputs.forEach((item, index) => {
+                items.push({
+                    item: item.value,
+                    area: parseFloat(areaInputs[index].value),
+                    price: parseFloat(priceInputs[index].value),
+                });
+            });
+
+            const data = {
+                name,
+                phone,
+                city,
+                client,
+                budget: parseFloat(budget),
+                items,
+            };
+
+            try {
+                const response = await fetch("http://localhost:3000/api/prestadores", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert("Prestador cadastrado com sucesso!");
+                    window.location.reload(); // Limpa o formulário
+                } else {
+                    alert("Erro ao cadastrar prestador.");
+                }
+            } catch (err) {
+                console.error("Erro:", err);
+                alert("Erro ao enviar os dados.");
+            }
+        });
+    </script>
+</body>
+</html>

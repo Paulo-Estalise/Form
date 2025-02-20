@@ -1,0 +1,165 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1c1c1c; /* Preto */
+    color: #ffffff; /* Branco */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+}
+
+h1 {
+    color: #0077b6; /* Azul escuro */
+    text-align: center; /* Centraliza o título */
+    margin-bottom: 20px;
+}
+
+/* Botão do gestor */
+#managerButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #0077b6; /* Azul escuro */
+    color: #ffffff; /* Branco */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#managerButton:hover {
+    background-color: #023e8a; /* Azul mais escuro */
+}
+
+/* Formulário e caixas de texto */
+#serviceProviderForm, #loginPage {
+    background-color: #2a2a2a; /* Cinza escuro */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    max-width: 600px; /* Largura máxima do formulário */
+    width: 100%; /* Ocupa 100% da largura disponível */
+    margin: 0 auto; /* Centraliza o formulário */
+    box-sizing: border-box; /* Garante que padding não aumente a largura */
+}
+
+#serviceProviderForm label, #loginPage label {
+    display: block;
+    margin-bottom: 5px;
+    color: #0077b6; /* Azul escuro */
+}
+
+#serviceProviderForm input[type="text"],
+#serviceProviderForm input[type="number"],
+#loginPage input[type="text"],
+#loginPage input[type="password"] {
+    width: 100%; /* Ocupa 100% da largura do contêiner */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #0077b6; /* Borda azul escuro */
+    border-radius: 8px; /* Bordas mais arredondadas */
+    background-color: #1c1c1c; /* Preto */
+    color: #ffffff; /* Branco */
+    font-size: 14px;
+    transition: border-color 0.3s ease; /* Transição suave */
+    box-sizing: border-box; /* Garante que padding e borda não aumentem a largura */
+}
+
+#serviceProviderForm input[type="text"]:focus,
+#serviceProviderForm input[type="number"]:focus,
+#loginPage input[type="text"]:focus,
+#loginPage input[type="password"]:focus {
+    border-color: #023e8a; /* Azul mais escuro ao focar */
+    outline: none; /* Remove o contorno padrão */
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5); /* Sombra suave ao focar */
+}
+
+/* Estilo para os itens (alinhados horizontalmente) */
+.item {
+    display: flex;
+    gap: 10px; /* Espaço entre os campos */
+    margin-bottom: 15px;
+}
+
+.item label {
+    flex: 1;
+    color: #0077b6; /* Azul escuro */
+}
+
+.item input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #0077b6; /* Borda azul escuro */
+    border-radius: 8px; /* Bordas mais arredondadas */
+    background-color: #1c1c1c; /* Preto */
+    color: #ffffff; /* Branco */
+    font-size: 14px;
+    transition: border-color 0.3s ease; /* Transição suave */
+    box-sizing: border-box; /* Garante que padding e borda não aumentem a largura */
+}
+
+.item input:focus {
+    border-color: #023e8a; /* Azul mais escuro ao focar */
+    outline: none; /* Remove o contorno padrão */
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5); /* Sombra suave ao focar */
+}
+
+/* Botões */
+#serviceProviderForm button, #loginPage button {
+    background-color: #0077b6; /* Azul escuro */
+    color: #ffffff; /* Branco */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px; /* Bordas mais arredondadas */
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease; /* Transição suave */
+    width: 100%; /* Botões ocupam a largura total */
+    box-sizing: border-box; /* Garante que padding não aumente a largura */
+}
+
+#serviceProviderForm button:hover, #loginPage button:hover {
+    background-color: #023e8a; /* Azul mais escuro */
+}
+
+/* Mensagem de erro */
+#cityError {
+    color: red;
+    display: none;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* Área do gestor */
+#loginPage, #managerPage {
+    display: none;
+    background-color: #2a2a2a; /* Cinza escuro */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 100%;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+#managerPage h2 {
+    color: #0077b6; /* Azul escuro */
+}
+
+#cidadesList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#cidadesList li {
+    background-color: #1c1c1c; /* Preto */
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    color: #ffffff; /* Branco */
+}
