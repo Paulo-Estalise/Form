@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Gestor</title>
-    <!-- Inclua a biblioteca jsPDF -->
+    
+    <!-- Biblioteca jsPDF para gerar PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         /* Reset básico */
         body, h2, label, input, button, p {
@@ -20,16 +22,16 @@
             color: #000000;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinhar no topo */
+            align-items: flex-start;
             height: 100vh;
-            padding-top: 50px; /* Espaço no topo */
+            padding-top: 50px;
         }
 
-        /* Container da área do gestor */
+        /* Container principal */
         #managerPage {
             background-color: #f9f9f9;
             padding: 20px;
-            width: 75%; /* Largura maior para acomodar o layout */
+            width: 75%;
             position: relative;
             border: 1px solid #cccccc;
             border-radius: 4px;
@@ -38,7 +40,7 @@
         h2 {
             margin-bottom: 20px;
             font-size: 24px;
-            text-align: center; /* Alinha o título à esquerda */
+            text-align: center;
         }
 
         label {
@@ -49,17 +51,12 @@
         }
 
         input[type="text"] {
-            width: 200px; /* Largura reduzida do campo de texto */
+            width: 200px;
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #cccccc;
             border-radius: 4px;
             font-size: 16px;
-        }
-
-        input[type="text"]:focus {
-            border-color: #000000;
-            outline: none;
         }
 
         button {
@@ -78,17 +75,7 @@
             background-color: #333333;
         }
 
-        /* Estilo para os botões no canto superior direito */
-        .top-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Estilo para a área de pesquisa no canto superior esquerdo */
+        /* Área de pesquisa */
         .search-area {
             position: absolute;
             top: 20px;
@@ -98,21 +85,20 @@
             gap: 10px;
         }
 
-        /* Estilo para os resultados */
-        #results {
-            margin-top: 120px; /* Espaço para os botões e área de pesquisa */
-            text-align: left;
-        }
-
-        #results p {
-            margin: 10px 0;
-        }
-
-        #results h3 {
-            margin-bottom: 15px;
+        /* Área dos botões de topo */
+        .top-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 10px;
+        }
+
+        /* Área de exibição de resultados */
+        #results {
+            margin-top: 120px;
+            text-align: left;
         }
 
         .prestador-item {
@@ -123,11 +109,6 @@
             background-color: #ffffff;
         }
 
-        .prestador-item button {
-            margin-right: 10px;
-        }
-
-        /* Botão pequeno para gerar PDF */
         .small-button {
             padding: 5px 10px;
             font-size: 14px;
@@ -137,47 +118,32 @@
         .small-button:hover {
             background-color: #666;
         }
-
-        /* Estilo para a lista de cidades */
-        .cidades-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .cidades-list p {
-            background-color: #f1f1f1;
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
     <div id="managerPage">
-        <!-- Título à esquerda -->
         <h2>Área do Gestor</h2>
 
-        <!-- Área de pesquisa no canto superior esquerdo -->
+        <!-- Área de pesquisa -->
         <div class="search-area">
             <label for="searchCity">Pesquisar por Cidade:</label>
             <input type="text" id="searchCity" required>
             <button onclick="searchByCity()">Pesquisar</button>
         </div>
 
-        <!-- Botões no canto superior direito -->
+        <!-- Botões superiores -->
         <div class="top-buttons">
             <button onclick="goHome()">Home</button>
             <button onclick="listAllPrestadores()">Listar Todos os Prestadores</button>
             <button onclick="showCidadesCadastradas()">Cidades Cadastradas</button>
         </div>
 
-        <!-- Área para exibir os resultados -->
+        <!-- Área de exibição de resultados -->
         <div id="results"></div>
     </div>
 
     <script>
-        // Função para redirecionar para a página inicial
+        // Função para voltar à página inicial
         function goHome() {
             window.location.href = "index.html";
         }
@@ -186,47 +152,13 @@
         async function listAllPrestadores() {
             try {
                 const response = await fetch("http://localhost:3000/api/prestadores");
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
                 const data = await response.json();
-
-                const resultsDiv = document.getElementById("results");
-                if (data.message) {
-                    resultsDiv.innerHTML = `<h3>Lista de Prestadores</h3><p>${data.message}</p>`;
-                } else {
-                    resultsDiv.innerHTML = `
-                        <h3>
-                            Lista de Prestadores
-                            <button class="small-button" onclick="generatePDF()">Gerar PDF</button>
-                        </h3>
-                    `;
-
-                    data.forEach((prestador) => {
-                        const itemsHTML = prestador.items.map(item => `
-                            <div style="margin-left: 20px;">
-                                <p><strong>Item:</strong> ${item.item}</p>
-                                <p><strong>Metros Quadrados:</strong> ${item.area}</p>
-                                <p><strong>Preço por m²:</strong> R$ ${item.price.toFixed(2)}</p>
-                            </div>
-                        `).join('');
-
-                        resultsDiv.innerHTML += `
-                            <div class="prestador-item" id="prestador-${prestador._id}">
-                                <p><strong>Nome:</strong> ${prestador.name}</p>
-                                <p><strong>Cidade:</strong> ${prestador.city}</p>
-                                <p><strong>Cliente:</strong> ${prestador.client}</p>
-                                <p><strong>Orçamento:</strong> R$ ${prestador.budget.toFixed(2)}</p>
-                                <h4>Itens Necessários:</h4>
-                                ${itemsHTML}
-                                <button onclick="deletePrestador('${prestador._id}')">Deletar</button>
-                            </div>
-                        `;
-                    });
-                }
+                
+                displayResults("Lista de Prestadores", data);
             } catch (err) {
-                console.error("Erro:", err);
                 alert("Erro ao carregar prestadores.");
+                console.error(err);
             }
         }
 
@@ -234,117 +166,58 @@
         async function showCidadesCadastradas() {
             try {
                 const response = await fetch("http://localhost:3000/api/prestadores/cidades");
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
                 const data = await response.json();
 
                 const resultsDiv = document.getElementById("results");
-                if (data.message) {
-                    resultsDiv.innerHTML = `<h3>Cidades Cadastradas</h3><p>${data.message}</p>`;
-                } else {
-                    resultsDiv.innerHTML = `
-                        <h3>Cidades Cadastradas</h3>
-                        <div class="cidades-list">
-                            ${data.map(cidade => `<p>${cidade}</p>`).join('')}
-                        </div>
-                    `;
-                }
+                resultsDiv.innerHTML = `<h3>Cidades Cadastradas</h3><p>${data.join(", ")}</p>`;
             } catch (err) {
-                console.error("Erro:", err);
                 alert("Erro ao carregar cidades.");
+                console.error(err);
             }
-        }
-
-        // Função para deletar um prestador
-        async function deletePrestador(id) {
-            try {
-                const response = await fetch(`http://localhost:3000/api/prestadores/${id}`, {
-                    method: "DELETE",
-                });
-
-                if (response.ok) {
-                    alert("Prestador deletado com sucesso!");
-                    document.getElementById(`prestador-${id}`).remove();
-                } else {
-                    alert("Erro ao deletar prestador.");
-                }
-            } catch (err) {
-                console.error("Erro:", err);
-                alert("Erro ao deletar prestador.");
-            }
-        }
-
-        // Função para gerar PDF
-        function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            const prestadores = document.querySelectorAll(".prestador-item");
-            let y = 10;
-
-            doc.text("Lista de Prestadores", 10, y);
-            y += 10;
-
-            prestadores.forEach((prestador) => {
-                const nome = prestador.querySelector("p:nth-child(1)").innerText;
-                const cidade = prestador.querySelector("p:nth-child(2)").innerText;
-                const cliente = prestador.querySelector("p:nth-child(3)").innerText;
-                const orcamento = prestador.querySelector("p:nth-child(4)").innerText;
-
-                doc.text(nome, 10, y);
-                doc.text(cidade, 10, y + 10);
-                doc.text(cliente, 10, y + 20);
-                doc.text(orcamento, 10, y + 30);
-                y += 40;
-            });
-
-            doc.save("lista_prestadores.pdf");
         }
 
         // Função para pesquisar por cidade
         async function searchByCity() {
-            const city = document.getElementById("searchCity").value;
+            const city = document.getElementById("searchCity").value.trim();
+
+            if (!city) {
+                alert("Por favor, insira uma cidade para pesquisar.");
+                return;
+            }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/prestadores/${city}`);
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.statusText}`);
-                }
+                const response = await fetch(`http://localhost:3000/api/prestadores?cidade=${encodeURIComponent(city)}`);
+                if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
+                
                 const data = await response.json();
-
-                const resultsDiv = document.getElementById("results");
-                if (data.message) {
-                    resultsDiv.innerHTML = `<h3>Resultados para ${city}:</h3><p>${data.message}</p>`;
-                } else {
-                    resultsDiv.innerHTML = `<h3>Resultados para ${city}:</h3>`;
-
-                    data.forEach((prestador) => {
-                        const itemsHTML = prestador.items.map(item => `
-                            <div style="margin-left: 20px;">
-                                <p><strong>Item:</strong> ${item.item}</p>
-                                <p><strong>Metros Quadrados:</strong> ${item.area}</p>
-                                <p><strong>Preço por m²:</strong> R$ ${item.price.toFixed(2)}</p>
-                            </div>
-                        `).join('');
-
-                        resultsDiv.innerHTML += `
-                            <div class="prestador-item" id="prestador-${prestador._id}">
-                                <p><strong>Nome:</strong> ${prestador.name}</p>
-                                <p><strong>Cidade:</strong> ${prestador.city}</p>
-                                <p><strong>Cliente:</strong> ${prestador.client}</p>
-                                <p><strong>Orçamento:</strong> R$ ${prestador.budget.toFixed(2)}</p>
-                                <h4>Itens Necessários:</h4>
-                                ${itemsHTML}
-                                <button onclick="deletePrestador('${prestador._id}')">Deletar</button>
-                            </div>
-                        `;
-                    });
-                }
+                displayResults(`Resultados para ${city}`, data);
             } catch (err) {
-                console.error("Erro:", err);
                 alert("Erro ao pesquisar por cidade.");
+                console.error(err);
             }
+        }
+
+        // Função para exibir resultados no HTML
+        function displayResults(title, data) {
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = `<h3>${title}</h3>`;
+
+            if (!data.length) {
+                resultsDiv.innerHTML += `<p>Nenhum resultado encontrado.</p>`;
+                return;
+            }
+
+            data.forEach(prestador => {
+                resultsDiv.innerHTML += `
+                    <div class="prestador-item">
+                        <p><strong>Nome:</strong> ${prestador.name}</p>
+                        <p><strong>Cidade:</strong> ${prestador.city}</p>
+                        <p><strong>Cliente:</strong> ${prestador.client}</p>
+                        <p><strong>Orçamento:</strong> R$ ${prestador.budget.toFixed(2)}</p>
+                    </div>
+                `;
+            });
         }
     </script>
 </body>
