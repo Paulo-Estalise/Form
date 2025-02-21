@@ -153,23 +153,22 @@
     </form>
 
     <script>
-        // Função para redirecionar para a tela de login do gestor
         function redirectToManager() {
             window.location.href = "loginGestor.html";
         }
 
-        // Função para validar a cidade
         function validateCity(input) {
             const cityError = document.getElementById("cityError");
-            const regex = /^[a-zA-ZÀ-ÿ\s]+$/; // Aceita apenas letras e espaços
+            const regex = /^[a-zA-ZÀ-ÿ\s]+$/;
             if (!regex.test(input.value)) {
                 cityError.style.display = "block";
+                return false;
             } else {
                 cityError.style.display = "none";
+                return true;
             }
         }
 
-        // Função para adicionar novos itens
         function addItem() {
             const itemsDiv = document.getElementById("items");
             const itemCount = itemsDiv.children.length + 1;
@@ -189,7 +188,6 @@
             itemsDiv.appendChild(newItem);
         }
 
-        // Função para calcular o orçamento total
         function calculateTotal() {
             const areas = document.querySelectorAll("input[name='areas[]']");
             const prices = document.querySelectorAll("input[name='prices[]']");
@@ -204,9 +202,13 @@
             document.getElementById("budget").value = total.toFixed(2);
         }
 
-        // Função para enviar os dados do formulário para o backend
         document.getElementById("serviceProviderForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+
+            if (!validateCity(document.getElementById("city"))) {
+                alert("Por favor, insira uma cidade válida.");
+                return;
+            }
 
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
@@ -247,7 +249,7 @@
 
                 if (response.ok) {
                     alert("Prestador cadastrado com sucesso!");
-                    window.location.reload(); // Limpa o formulário
+                    window.location.reload();
                 } else {
                     alert("Erro ao cadastrar prestador.");
                 }

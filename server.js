@@ -4,16 +4,20 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const { celebrate, Joi, errors } = require('celebrate');
+const dotenv = require('dotenv');
+
+// Carrega variáveis de ambiente
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Conectar ao MongoDB (usar IP em vez de localhost se necessário)
-mongoose.connect('mongodb://127.0.0.1:27017/prestadorServicos')
+// Conexão com o MongoDB (sem opções obsoletas)
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/prestadorServicos')
     .then(() => console.log('Conectado ao MongoDB'))
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
-// Definir o Schema e o Model
+// Schema e Modelo do Mongoose
 const prestadorSchema = new mongoose.Schema({
     name: { type: String, required: true },
     city: { type: String, required: true },
@@ -29,12 +33,12 @@ const prestadorSchema = new mongoose.Schema({
 
 const Prestador = mongoose.model('Prestador', prestadorSchema);
 
-// Middleware para segurança e parsear o corpo das requisições
-app.use(helmet());
-app.use(bodyParser.json({ limit: '50kb' })); // Aumentei o limite do corpo
-app.use(cors());
+// Middlewares
+app.use(helmet()); // Adiciona headers de segurança
+app.use(bodyParser.json({ limit: '50kb' })); // Limita o tamanho do payload
+app.use(cors()); // Habilita CORS
 
-// Rota para salvar os dados do formulário com validação
+// Rota para cadastrar prestador
 app.post('/api/prestadores', celebrate({
     body: Joi.object({
         name: Joi.string().required(),
@@ -58,7 +62,7 @@ app.post('/api/prestadores', celebrate({
     }
 });
 
-// Rota para listar todas as cidades com prestadores cadastrados
+// Rota para listar cidades
 app.get('/api/prestadores/cidades', async (req, res, next) => {
     try {
         const cidades = await Prestador.distinct('city');
@@ -68,7 +72,7 @@ app.get('/api/prestadores/cidades', async (req, res, next) => {
     }
 });
 
-// Rota para listar todos os prestadores cadastrados
+// Rota para listar todos os prestadores
 app.get('/api/prestadores', async (req, res, next) => {
     try {
         const prestadores = await Prestador.find({});
@@ -78,7 +82,7 @@ app.get('/api/prestadores', async (req, res, next) => {
     }
 });
 
-// Rota para deletar um prestador
+// Rota para deletar prestador
 app.delete('/api/prestadores/:id', async (req, res, next) => {
     try {
         const prestador = await Prestador.findByIdAndDelete(req.params.id);
@@ -88,16 +92,16 @@ app.delete('/api/prestadores/:id', async (req, res, next) => {
     }
 });
 
-// Middleware para tratar erros de validação (celebrate)
+// Tratamento de erros do Celebrate
 app.use(errors());
 
-// Middleware para tratar erros globais
+// Middleware de erro global
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Algo deu errado!' });
 });
 
-// Iniciar o servidor e escutar em todas as interfaces
+// Iniciar servidor
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
