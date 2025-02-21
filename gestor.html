@@ -146,6 +146,15 @@
             border-radius: 4px;
             margin: 0;
         }
+
+        .items-list {
+            margin-top: 10px;
+        }
+
+        .items-list p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -226,6 +235,14 @@
                     <p>Cliente: ${prestador.client}</p>
                     <p>Telefone: ${prestador.phone}</p>
                     <p>Orçamento: R$ ${prestador.budget.toFixed(2)}</p>
+                    <div class="items-list">
+                        <h4>Itens Necessários:</h4>
+                        ${prestador.items.map(item => `
+                            <p>Item: ${item.item}</p>
+                            <p>Metros Quadrados: ${item.area}</p>
+                            <p>Preço por m²: R$ ${item.price.toFixed(2)}</p>
+                        `).join('')}
+                    </div>
                     <button class="small-button" onclick="deletePrestador('${prestador._id}')">Deletar</button>
                 `;
                 resultsDiv.appendChild(prestadorDiv);
