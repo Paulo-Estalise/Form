@@ -2,11 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const helmet = require('helmet');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const app = express();
 const PORT = 3000;
 
-// Conectar ao MongoDB
+// Conectar ao MongoDB (sem opções obsoletas)
 mongoose.connect('mongodb://localhost:27017/prestadorServicos')
     .then(() => console.log('Conectado ao MongoDB'))
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
@@ -27,38 +29,47 @@ const prestadorSchema = new mongoose.Schema({
 
 const Prestador = mongoose.model('Prestador', prestadorSchema);
 
-// Middleware para parsear o corpo das requisições
+// Middleware para segurança e parsear o corpo das requisições
+app.use(helmet());
 app.use(bodyParser.json({ limit: '10kb' }));
 app.use(cors());
 
-// Rota para salvar os dados do formulário
-app.post('/api/prestadores', async (req, res) => {
-    const { name, city, client, phone, budget, items } = req.body;
-
-    // Validação básica
-    if (!name || !city || !client || !phone || !budget || !items) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
-    }
-
-    const newPrestador = new Prestador({
-        name,
-        city,
-        client,
-        phone,
-        budget,
-        items,
-    });
-
+// Rota para salvar os dados do formulário com validação
+app.post('/api/prestadores', celebrate({
+    body: Joi.object({
+        name: Joi.string().required(),
+        city: Joi.string().required(),
+        client: Joi.string().required(),
+        phone: Joi.string().required(),
+        budget: Joi.number().required(),
+        items: Joi.array().items(Joi.object({
+            item: Joi.string().required(),
+            area: Joi.number().required(),
+            price: Joi.number().required(),
+        })).required(),
+    }),
+}), async (req, res, next) => {
     try {
+        const { name, city, client, phone, budget, items } = req.body;
+
+        const newPrestador = new Prestador({
+            name,
+            city,
+            client,
+            phone,
+            budget,
+            items,
+        });
+
         await newPrestador.save();
         res.status(201).json({ message: 'Prestador cadastrado com sucesso!' });
     } catch (err) {
-        res.status(400).json({ message: `Erro ao salvar prestador: ${err.message}` });
+        next(err);
     }
 });
 
 // Rota para listar todas as cidades com prestadores cadastrados
-app.get('/api/prestadores/cidades', async (req, res) => {
+app.get('/api/prestadores/cidades', async (req, res, next) => {
     try {
         const cidades = await Prestador.distinct('city');
         if (cidades.length === 0) {
@@ -66,13 +77,12 @@ app.get('/api/prestadores/cidades', async (req, res) => {
         }
         res.status(200).json(cidades);
     } catch (err) {
-        console.error("Erro ao listar cidades:", err);
-        res.status(400).json({ message: `Erro ao listar cidades: ${err.message}` });
+        next(err);
     }
 });
 
 // Rota para listar todos os prestadores cadastrados
-app.get('/api/prestadores', async (req, res) => {
+app.get('/api/prestadores', async (req, res, next) => {
     try {
         const prestadores = await Prestador.find({});
         if (prestadores.length === 0) {
@@ -80,12 +90,12 @@ app.get('/api/prestadores', async (req, res) => {
         }
         res.status(200).json(prestadores);
     } catch (err) {
-        res.status(400).json({ message: `Erro ao listar prestadores: ${err.message}` });
+        next(err);
     }
 });
 
 // Rota para deletar um prestador
-app.delete('/api/prestadores/:id', async (req, res) => {
+app.delete('/api/prestadores/:id', async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -95,11 +105,14 @@ app.delete('/api/prestadores/:id', async (req, res) => {
         }
         res.status(200).json({ message: 'Prestador deletado com sucesso!' });
     } catch (err) {
-        res.status(400).json({ message: `Erro ao deletar prestador: ${err.message}` });
+        next(err);
     }
 });
 
-// Middleware para tratar erros
+// Middleware para tratar erros de validação (celebrate)
+app.use(errors());
+
+// Middleware para tratar erros globais
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Algo deu errado!' });
