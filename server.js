@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 app.use('/api/prestadores', prestadoresRoutes);
 
 // Tratamento de erros do Celebrate (validação de dados)
-app.use(errors()); // Corrigido: estava escrito "errors" incorretamente
+app.use(errors());
 
 // Middleware de erro global
 app.use((err, req, res, next) => {
