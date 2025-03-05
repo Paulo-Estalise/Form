@@ -1,6 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const Prestador = require('../models/Prestador'); // Importa o modelo Prestador
+const Prestador = require('../models/prestadores'); // Importa o modelo Prestador
 
 const router = express.Router();
 
@@ -28,34 +28,6 @@ router.post('/', celebrate({
     }
 });
 
-// Rota para listar todas as cidades dos prestadores
-router.get('/cidades', async (req, res, next) => {
-    try {
-        const cidades = await Prestador.distinct('city'); // Busca cidades distintas
-        res.status(200).json(cidades.length ? cidades : { message: 'Nenhuma cidade cadastrada.' });
-    } catch (err) {
-        next(err); // Passa o erro para o middleware de tratamento de erros
-    }
-});
-
-// Rota para listar todos os prestadores
-router.get('/', async (req, res, next) => {
-    try {
-        const prestadores = await Prestador.find({}); // Busca todos os prestadores
-        res.status(200).json(prestadores.length ? prestadores : { message: 'Nenhum prestador cadastrado.' });
-    } catch (err) {
-        next(err); // Passa o erro para o middleware de tratamento de erros
-    }
-});
-
-// Rota para deletar um prestador pelo ID
-router.delete('/:id', async (req, res, next) => {
-    try {
-        const prestador = await Prestador.findByIdAndDelete(req.params.id); // Deleta o prestador pelo ID
-        res.status(200).json(prestador ? { message: 'Prestador deletado com sucesso!' } : { message: 'Prestador não encontrado.' });
-    } catch (err) {
-        next(err); // Passa o erro para o middleware de tratamento de erros
-    }
-});
+// Outras rotas (listar, deletar, etc.)...
 
 module.exports = router; // Exporta o router para ser usado em outras partes da aplicação
