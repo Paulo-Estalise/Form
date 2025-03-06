@@ -1,6 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const Prestador = require('../models/prestadores'); // Importa o modelo Prestador
+const Prestador = require('../models/Prestador'); // Importa o modelo Prestador
 
 const router = express.Router();
 

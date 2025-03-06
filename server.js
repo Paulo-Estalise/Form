@@ -23,10 +23,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/prestador
 app.use(helmet()); // Adiciona headers de segurança
 app.use(bodyParser.json({ limit: '50kb' })); // Limita o tamanho do payload
 app.use(cors({
-    origin: 'http://localhost:4000', // Permite apenas requisições do frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
-    allowedHeaders: ['Content-Type', 'Authorization'] // Headers permitidos
+    origin: ['http://localhost:4000', 'http://127.0.0.1:5500'], // Adicionando a origem do Live Server
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 // Serve arquivos estáticos (frontend)
 app.use(express.static(path.join(__dirname, 'public')));

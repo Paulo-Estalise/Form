@@ -183,7 +183,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/prestadores?city=${city}`);
+                const response = await fetch(`http://localhost:4000/api/prestadores?city=${city}`);
                 const data = await response.json();
                 displayResults(data);
             } catch (error) {
@@ -195,7 +195,7 @@
         // Função para listar todos os prestadores
         async function listAllPrestadores() {
             try {
-                const response = await fetch('http://localhost:3000/api/prestadores');
+                const response = await fetch('http://localhost:4000/api/prestadores');
                 const data = await response.json();
                 displayResults(data);
             } catch (error) {
@@ -207,7 +207,7 @@
         // Função para mostrar cidades cadastradas
         async function showCidadesCadastradas() {
             try {
-                const response = await fetch('http://localhost:3000/api/prestadores/cidades');
+                const response = await fetch('http://localhost:4000/api/prestadores/cidades');
                 const data = await response.json();
                 displayCidades(data);
             } catch (error) {
@@ -272,7 +272,7 @@
         // Função para deletar um prestador
         async function deletePrestador(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/prestadores/${id}`, {
+                const response = await fetch(`http://localhost:4000/api/prestadores/${id}`, {
                     method: 'DELETE',
                 });
                 const data = await response.json();
